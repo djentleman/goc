@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "goc"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = ["Todd Perry <toddperry171@gmail.com>"]
 readme = "README.md"
+repository = "https://github.com/djentleman/goc"
 packages = [
     { include = "goc" }
 ]

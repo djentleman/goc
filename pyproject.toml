@@ -2,8 +2,12 @@
 name = "goc"
 version = "0.1.0"
 description = ""
-authors = ["Todd Perry <perry@nowcast.co.jp>"]
+authors = ["Todd Perry <toddperry171@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "goc" }
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -13,3 +17,6 @@ openai = "^0.27.8"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+goc = 'goc.goc:goc'

@@ -38,7 +38,7 @@ Replace `[arguments]` with the appropriate options based on your requirement:
 
 - **Document Latest Commit**:
   ```bash
-  gic
+  goc
   ```
 
 - **Document Comparison vs Current Commit**:

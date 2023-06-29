@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "goc"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["Todd Perry <toddperry171@gmail.com>"]
 readme = "README.md"

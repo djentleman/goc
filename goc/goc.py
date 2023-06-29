@@ -18,7 +18,7 @@ def document_latest_commit():
     ]
     return prompt_chain
 
-def document_comparison_vs_current_commit(args):
+def document_git_diff_wrap(args):
     fmt_args = " ".join(args)
     cmd = f"git diff {fmt_args}"
     git_diff = exec_bash_cmd(cmd)

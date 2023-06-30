@@ -6,18 +6,6 @@ import json
 def exec_bash_cmd(cmd):
     return os.popen(cmd).read()[:-1]
 
-def document_latest_commit():
-    # compare latest 2 commits
-    commit_hashes = exec_bash_cmd("git log | egrep '^commit ' | head -n 2 | awk '{print $NF}'")
-    latest_commit, prev_commit = commit_hashes.split('\n')
-    cmd = f"git diff {prev_commit} {latest_commit}"
-    git_diff = exec_bash_cmd(cmd)
-    prompt_chain = [
-        'I send you a git diff, and you write documentation of the commit in markdown',
-        git_diff
-    ]
-    return prompt_chain
-
 def document_git_diff_wrap(args):
     fmt_args = " ".join(args)
     cmd = f"git diff {fmt_args}"
@@ -34,6 +22,9 @@ def document_git_diff_wrap(args):
 def git_commit_wrap():
     cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
+    if len(git_diff) == 0:
+        print('No Git Diff Found')
+        return []
     prompt_chain = [
         'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
         git_diff

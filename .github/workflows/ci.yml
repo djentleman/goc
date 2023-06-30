@@ -2,12 +2,11 @@
 on:
   pull_request:
     branches: 
+      - develop
       - main
-    types: [closed]
 
 jobs:
-  release:
-    if: github.event.pull_request.merged == true
+  unit_tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -20,14 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
-    - name: Configure Pypi
+    - name: Run Tests
       run: |
-        poetry config pypi-token.pypi ${PYPI_TOKEN}
-      env:
-        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-    - name: Build
-      run: |
-        poetry build
-    - name: Release
-      run: |
-        poetry publish
+        cd tests
+        poetry run pytest -x --verbose

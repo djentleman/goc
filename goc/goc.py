@@ -29,9 +29,7 @@ def document_git_diff_wrap(args):
     return prompt_chain
 
 def git_commit_wrap():
-    # compare latest 2 commits
-    commit_hash = exec_bash_cmd("git log | egrep '^commit ' | head -n 1 | awk '{print $NF}'")
-    cmd = f"git diff {commit_hash}"
+    cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     prompt_chain = [
         'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',

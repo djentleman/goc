@@ -80,6 +80,24 @@ class GitCommitWrapTests(unittest.TestCase):
         self.assertEqual(result, expected_prompt_chain)
         mock_exec_bash_cmd.assert_called_with("git diff --staged")
 
+class ParseGptRespTests(unittest.TestCase):
+    def test_parse_gpt_resp(self):
+        resp = {
+            'choices': [
+                {
+                    'message': {
+                        'content': 'This is the GPT output.'
+                    }
+                }
+            ]
+        }
+
+        expected_output = 'This is the GPT output.'
+
+        result = parse_gpt_resp(resp)
+
+        self.assertEqual(result, expected_output)
+
 if __name__ == "__main__":
     unittest.main()
 

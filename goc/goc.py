@@ -22,6 +22,9 @@ def document_git_diff_wrap(args):
     fmt_args = " ".join(args)
     cmd = f"git diff {fmt_args}"
     git_diff = exec_bash_cmd(cmd)
+    if len(git_diff) == 0:
+        print('No Git Diff Found')
+        return []
     prompt_chain = [
         'I send you a git diff, and you write documentation of the commit in markdown',
         git_diff
@@ -83,6 +86,7 @@ def get_args():
 
 def goc():
     mode = get_args()
+    prompt_chain = []
     if mode == 'help':
         print_help_text()
         return
@@ -93,13 +97,14 @@ def goc():
         # get description of the current diff
         prompt_chain = git_commit_wrap()
 
-    resp = execute_prompt_chain(prompt_chain)
-    gpt_output = parse_gpt_resp(resp)
-    if mode == 'diff':
-        print(gpt_output)
-    elif mode == 'commit':
-        print('Committing with message: ' + gpt_output)
-        do_git_commit(gpt_output)
+    if len(prompt_chain) > 0:
+        resp = execute_prompt_chain(prompt_chain)
+        gpt_output = parse_gpt_resp(resp)
+        if mode == 'diff':
+            print(gpt_output)
+        elif mode == 'commit':
+            print('Committing with message: ' + gpt_output)
+            do_git_commit(gpt_output)
 
 
 if __name__ == '__main__':

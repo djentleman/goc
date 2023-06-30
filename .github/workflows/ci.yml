@@ -22,4 +22,4 @@ jobs:
     - name: Run Tests
       run: |
         cd tests
-        pytest -x --verbose
+        poetry run pytest -x --verbose

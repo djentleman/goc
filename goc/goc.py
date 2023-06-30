@@ -82,6 +82,7 @@ def goc():
     if mode == 'diff':
         print(gpt_output)
     elif mode == 'commit':
+        print('Committing with message: ' + gpt_output)
         do_git_commit(gpt_output)
 
 

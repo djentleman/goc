@@ -1,0 +1,25 @@
+
+on:
+  pull_request:
+    branches: 
+      - develop
+      - main
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.8'
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Run Tests
+      run: |
+        cd tests
+        pytest -x --verbose

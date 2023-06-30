@@ -28,6 +28,17 @@ def document_git_diff_wrap(args):
     ]
     return prompt_chain
 
+def git_commit_wrap():
+    # compare latest 2 commits
+    commit_hash = exec_bash_cmd("git log | egrep '^commit ' | head -n 1 | awk '{print $NF}'")
+    cmd = f"git diff {commit_hash}"
+    git_diff = exec_bash_cmd(cmd)
+    prompt_chain = [
+        'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
+        git_diff
+    ]
+    return prompt_chain
+
 def execute_prompt_chain(prompt_chain):
     resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -39,20 +50,39 @@ def execute_prompt_chain(prompt_chain):
     return resp
 
 def parse_gpt_resp(resp):
-    md_output = resp['choices'][-1]['message']['content']
-    return md_output
+    gpt_output = resp['choices'][-1]['message']['content']
+    return gpt_output
+
+def do_git_commit(gpt_output):
+    gpt_output = gpt_output.split('\n')[0]
+    cmd = f'git commit -m {gpt_output}'
+    exec_bash_cmd(cmd)
+
+def print_help_text():
+    print('help text')
 
 def goc():
     n_args = len(sys.argv) - 1
     if n_args == 0:
-        # compare the latest 2 commits
-        prompt_chain = document_latest_commit()
+        print('No Arguments, Please run "goc <mode> <args>"')
     elif n_args > 0:
-        # just pass the args directly into git diff
-        prompt_chain = document_git_diff_wrap(sys.argv[1:])
+        mode = sys.argv[1]
+        if mode == 'help':
+            print_help_text()
+            return
+        if mode == 'diff':
+            # just pass the args directly into git diff
+            prompt_chain = document_git_diff_wrap(sys.argv[2:])
+        elif mode == 'commit':
+            # get description of the current diff
+            prompt_chain = git_commit_wrap()
+
     resp = execute_prompt_chain(prompt_chain)
-    md_output = parse_gpt_resp(resp)
-    print(md_output)
+    gpt_output = parse_gpt_resp(resp)
+    if mode == 'diff':
+        print(gpt_output)
+    elif mode == 'commit':
+        do_git_commit(gpt_output)
 
 
 if __name__ == '__main__':

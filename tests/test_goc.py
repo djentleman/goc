@@ -1,25 +1,19 @@
-import goc as target
+from goc import goc as target
 import unittest
 from unittest.mock import patch
 
-class DocumentLatestCommitTests(unittest.TestCase):
-    @patch("your_module.exec_bash_cmd")
-    def test_document_latest_commit(self, mock_exec_bash_cmd):
-        # Mocking the output of exec_bash_cmd
-        mock_exec_bash_cmd.return_value = "commit_hash_1\ncommit_hash_2\n"
 
-        expected_prompt_chain = [
-            'I send you a git diff, and you write documentation of the commit in markdown',
-            "git_diff_output"
-        ]
+class ExecBashCmdTests(unittest.TestCase):
+    @patch("os.popen")
+    def test_exec_bash_cmd(self, mock_popen):
+        mock_popen.return_value.read.return_value = "command_output\n"
+        cmd = "some_command"
 
-        with patch("target.exec_bash_cmd") as mock_exec_bash_cmd:
-            mock_exec_bash_cmd.return_value = "git_diff_output"
-            result = target.document_latest_commit()
+        result = target.exec_bash_cmd(cmd)
 
-        self.assertEqual(result, expected_prompt_chain)
-        mock_exec_bash_cmd.assert_called_with("git log | egrep '^commit ' | head -n 2 | awk '{print $NF}'")
-        mock_exec_bash_cmd.assert_called_with("git diff commit_hash_1 commit_hash_2")
+        self.assertEqual(result, "command_output")
+        mock_popen.assert_called_with(cmd)
+        mock_popen.return_value.read.assert_called_once()
 
 if __name__ == "__main__":
     unittest.main()

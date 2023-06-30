@@ -94,7 +94,7 @@ class ParseGptRespTests(unittest.TestCase):
 
         expected_output = 'This is the GPT output.'
 
-        result = parse_gpt_resp(resp)
+        result = goc.parse_gpt_resp(resp)
 
         self.assertEqual(result, expected_output)
 

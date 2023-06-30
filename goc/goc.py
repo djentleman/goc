@@ -74,21 +74,26 @@ Options:
 """
     print(helptext)
 
-def goc():
+def get_args():
     n_args = len(sys.argv) - 1
     if n_args == 0:
         print('No Arguments, Please run "goc <mode> <args>"')
+        mode = 'help'
     elif n_args > 0:
         mode = sys.argv[1]
-        if mode == 'help':
-            print_help_text()
-            return
-        if mode == 'diff':
-            # just pass the args directly into git diff
-            prompt_chain = document_git_diff_wrap(sys.argv[2:])
-        elif mode == 'commit':
-            # get description of the current diff
-            prompt_chain = git_commit_wrap()
+    return mode
+
+def goc():
+    mode = get_args()
+    if mode == 'help':
+        print_help_text()
+        return
+    if mode == 'diff':
+        # just pass the args directly into git diff
+        prompt_chain = document_git_diff_wrap(sys.argv[2:])
+    elif mode == 'commit':
+        # get description of the current diff
+        prompt_chain = git_commit_wrap()
 
     resp = execute_prompt_chain(prompt_chain)
     gpt_output = parse_gpt_resp(resp)

@@ -22,6 +22,9 @@ def document_git_diff_wrap(args):
     fmt_args = " ".join(args)
     cmd = f"git diff {fmt_args}"
     git_diff = exec_bash_cmd(cmd)
+    if len(git_diff) == 0:
+        print('No Git Diff Found')
+        return []
     prompt_chain = [
         'I send you a git diff, and you write documentation of the commit in markdown',
         git_diff
@@ -29,9 +32,7 @@ def document_git_diff_wrap(args):
     return prompt_chain
 
 def git_commit_wrap():
-    # compare latest 2 commits
-    commit_hash = exec_bash_cmd("git log | egrep '^commit ' | head -n 1 | awk '{print $NF}'")
-    cmd = f"git diff {commit_hash}"
+    cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     prompt_chain = [
         'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
@@ -74,29 +75,36 @@ Options:
 """
     print(helptext)
 
-def goc():
+def get_args():
     n_args = len(sys.argv) - 1
     if n_args == 0:
         print('No Arguments, Please run "goc <mode> <args>"')
+        mode = 'help'
     elif n_args > 0:
         mode = sys.argv[1]
-        if mode == 'help':
-            print_help_text()
-            return
-        if mode == 'diff':
-            # just pass the args directly into git diff
-            prompt_chain = document_git_diff_wrap(sys.argv[2:])
-        elif mode == 'commit':
-            # get description of the current diff
-            prompt_chain = git_commit_wrap()
+    return mode
 
-    resp = execute_prompt_chain(prompt_chain)
-    gpt_output = parse_gpt_resp(resp)
+def goc():
+    mode = get_args()
+    prompt_chain = []
+    if mode == 'help':
+        print_help_text()
+        return
     if mode == 'diff':
-        print(gpt_output)
+        # just pass the args directly into git diff
+        prompt_chain = document_git_diff_wrap(sys.argv[2:])
     elif mode == 'commit':
-        print('Committing with message: ' + gpt_output)
-        do_git_commit(gpt_output)
+        # get description of the current diff
+        prompt_chain = git_commit_wrap()
+
+    if len(prompt_chain) > 0:
+        resp = execute_prompt_chain(prompt_chain)
+        gpt_output = parse_gpt_resp(resp)
+        if mode == 'diff':
+            print(gpt_output)
+        elif mode == 'commit':
+            print('Committing with message: ' + gpt_output)
+            do_git_commit(gpt_output)
 
 
 if __name__ == '__main__':

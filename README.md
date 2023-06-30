@@ -31,24 +31,41 @@ poetry install
 To execute the script, run the following command:
 
 ```bash
-goc [arguments]
+goc [mode] [arguments]
 ```
 
-Replace `[arguments]` with the appropriate options based on your requirement:
+Replace [mode] with one of the following options:
 
-- **Document Latest Commit**:
+diff: Generate documentation for the git diff between commits or files.
+commit: Generate a commit message for the current git diff.
+Replace [arguments] based on the mode selected:
+
+For the diff mode, provide the arguments to specify the commits or files to compare.
+For the commit mode, no additional arguments are needed.
+
+- **Generate documentation for the diff between two commits**:
   ```bash
-  goc
+  goc diff [commit_a] [commit_b]
   ```
 
 - **Document Comparison vs Current Commit**:
   ```bash
-  goc [commit_hash]
+  goc diff [commit_hash]
   ```
 
-- **Document Comparison of Two Commits**:
+- **Document Comparison of a single commit**:
   ```bash
-  goc [commit_a] [commit_b]
+  goc diff [commit_hash]^!
+  ```
+
+- **Document Staged Changes**:
+  ```bash
+  goc diff --staged
+  ```
+
+- **Automatically generate commit message and commit**:
+  ```bash
+  goc commit
   ```
 
 ## Output
@@ -59,7 +76,7 @@ The script generates Markdown documentation by utilizing the OpenAI GPT-3.5 Turb
 ## Examples
 
 ```bash
-$ goc a0f72101be85667a362425c2cdc30ef794e2a738
+$ goc diff a0f72101be85667a362425c2cdc30ef794e2a738
 ## Commit Details
 
 - **Commit Type:** Code update
@@ -76,6 +93,11 @@ $ goc a0f72101be85667a362425c2cdc30ef794e2a738
 1. Updated the version to `"0.2.0"`.
 
 Please review and merge these changes.
+```
+
+```bash
+$ goc commit
+Committing with message: "Update git diff handling, handle case when no diff is found"
 ```
 
 ## Note

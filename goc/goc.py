@@ -55,6 +55,8 @@ def parse_gpt_resp(resp):
 
 def do_git_commit(gpt_output):
     gpt_output = gpt_output.split('\n')[0]
+    if gpt_output[0] != '"':
+        gpt_output = f'"{gpt_output}"'
     cmd = f'git commit -m {gpt_output}'
     exec_bash_cmd(cmd)
 

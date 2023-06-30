@@ -59,7 +59,18 @@ def do_git_commit(gpt_output):
     exec_bash_cmd(cmd)
 
 def print_help_text():
-    print('help text')
+    helptext = """
+Usage: goc <mode> <args>
+
+Modes:
+  diff <args>      Generate documentation for the git diff between commits or files.
+  commit           Generate a commit message for the current git diff.
+
+Options:
+  help             Show this help text.
+
+"""
+    print(helptext)
 
 def goc():
     n_args = len(sys.argv) - 1

@@ -1,7 +1,7 @@
 import openai
 import os
-import sys
 import json
+import argparse
 
 def exec_bash_cmd(cmd):
     return os.popen(cmd).read()[:-1]
@@ -31,9 +31,9 @@ def git_commit_wrap():
     ]
     return prompt_chain
 
-def execute_prompt_chain(prompt_chain):
+def execute_prompt_chain(prompt_chain, gpt_ver='3.5-turbo'):
     resp = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=f"gpt-{gpt_ver}",
         messages=[
             {"role": "assistant", "content": cmd}
             for cmd in prompt_chain
@@ -67,33 +67,32 @@ Options:
     print(helptext)
 
 def get_args():
-    n_args = len(sys.argv) - 1
-    if n_args == 0:
-        print('No Arguments, Please run "goc <mode> <args>"')
-        mode = 'help'
-    elif n_args > 0:
-        mode = sys.argv[1]
-    return mode
+    parser = argparse.ArgumentParser()
+    parser.add_argument('mode', choices=['commit', 'diff', 'help'], default='help')
+    parser.add_argument('--gpt_ver', default='3.5-turbo')
+
+    args, gitargs = parser.parse_known_args()
+    return args, gitargs
 
 def goc():
-    mode = get_args()
+    args, gitargs = get_args()
     prompt_chain = []
-    if mode == 'help':
+    if args.mode == 'help':
         print_help_text()
         return
-    if mode == 'diff':
+    if args.mode == 'diff':
         # just pass the args directly into git diff
-        prompt_chain = document_git_diff_wrap(sys.argv[2:])
-    elif mode == 'commit':
+        prompt_chain = document_git_diff_wrap(gitargs)
+    elif args.mode == 'commit':
         # get description of the current diff
         prompt_chain = git_commit_wrap()
 
     if len(prompt_chain) > 0:
-        resp = execute_prompt_chain(prompt_chain)
+        resp = execute_prompt_chain(prompt_chain, gpt_ver=args.gpt_ver)
         gpt_output = parse_gpt_resp(resp)
-        if mode == 'diff':
+        if args.mode == 'diff':
             print(gpt_output)
-        elif mode == 'commit':
+        elif args.mode == 'commit':
             print('Committing with message: ' + gpt_output)
             do_git_commit(gpt_output)
 

@@ -1,3 +1,4 @@
+import click
 import openai
 import os
 import json
@@ -23,7 +24,7 @@ def git_commit_wrap():
     cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     if len(git_diff) == 0:
-        print('No Git Diff Found')
+        print('No Staged Git Diff Found')
         return []
     prompt_chain = [
         'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',

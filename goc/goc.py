@@ -1,7 +1,6 @@
 import click
 import openai
 import os
-import argparse
 
 
 def exec_bash_cmd(cmd):
@@ -93,6 +92,10 @@ def commit(gpt_ver: str):
         do_git_commit(gpt_output)
 
 
-if __name__ == '__main__':
+def goc():
     cli = click.CommandCollection(sources=[diff_cmd, commit_cmd])
     cli()
+
+
+if __name__ == '__main__':
+    goc()

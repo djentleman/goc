@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 import click
 import openai
@@ -72,7 +73,7 @@ def commit_cmd():
 @diff_cmd.command(help="Generate documentation for the git diff between commits or files")
 @click.option("--gpt_ver", help="GPT model version to use", default="3.5-turbo")
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
-def diff(gpt_ver: str, args: list[str]):
+def diff(gpt_ver: str, args: List[str]):
     prompt_chain = []
     prompt_chain = document_git_diff_wrap(args)
     if len(prompt_chain) > 0:

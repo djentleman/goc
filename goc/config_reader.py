@@ -2,7 +2,9 @@ import os
 import json
 
 def parse_config():
-    config = json.loads(os.path.expanduser("~/.config/goc/config.json"))
+    config = json.loads(open(
+        os.path.expanduser("~/.config/goc/config.json")
+    ).read())
     return config
 
 def get_default_commit_template():

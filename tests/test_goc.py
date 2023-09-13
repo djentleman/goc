@@ -33,7 +33,24 @@ class DocumentGitDiffWrapTests(unittest.TestCase):
         args = ["--stat", "commit_hash"]
 
         expected_prompt_chain = [
-            'I send you a git diff, and you write documentation of the commit in markdown',
+        'When I send you a git diff, write documentation of the diff in markdown for a pull request',
+        """Please use this format for the git diff
+
+# Git Commit Diff
+
+## Description
+- Briefly describe the changes made in this commit.
+
+## Files Modified
+- List the files that were modified in this commit:
+
+  - `file1.ext`: Describe changes made in this file.
+  - `file2.ext`: Explain modifications in this file.
+  - ...
+
+## Changes Made
+- Specify the changes made to each file, including additions, deletions, and modifications.
+    """,
             "git_diff_output"
         ]
 
@@ -60,7 +77,8 @@ class GitCommitWrapTests(unittest.TestCase):
         mock_exec_bash_cmd.return_value = "git_diff_output"
 
         expected_prompt_chain = [
-            'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
+        'When I send you a git diff, write a commit message in 50 characters or less, do not include "git commit" or the character count',
+        f'Please use this format for the git diff\n\n<Fix|Add|Update|Refactor|Docs>: <commit message>',
             "git_diff_output"
         ]
 

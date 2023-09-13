@@ -2,9 +2,14 @@ import os
 import json
 
 def parse_config():
-    config = json.loads(open(
-        os.path.expanduser("~/.config/goc/config.json")
-    ).read())
+    config_path = os.path.expanduser("~/.config/goc/config.json")
+    if os.path.exists(config_path):
+        config = json.loads(open(config_path).read())
+    else:
+        config = {
+            "commit_template": "default",
+            "diff_template": "default",
+        }
     return config
 
 def get_default_commit_template():

@@ -23,16 +23,21 @@ def document_git_diff_wrap(args):
     return prompt_chain
 
 
-def git_commit_wrap():
+def git_commit_wrap(m: str = None):
     cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     if len(git_diff) == 0:
         print('No Staged Git Diff Found')
         return []
+
     prompt_chain = [
         'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
-        git_diff
     ]
+    if m is not None:
+        prompt_chain.append(
+            f'Here is a hint from the user about the commit message: "{m}" - the following prompt will be a git diff'
+        )
+    prompt_chain.append(git_diff)
     return prompt_chain
 
 
@@ -84,9 +89,10 @@ def diff(gpt_ver: str, args: List[str]):
 
 @commit_cmd.command(help="Generate a commit message for the current git diff")
 @click.option("--gpt_ver", help="GPT model version to use", default="3.5-turbo")
-def commit(gpt_ver: str):
+@click.option("-m", help="Hint Message to send to chat GPT", default=None)
+def commit(gpt_ver: str, m: str):
     prompt_chain = []
-    prompt_chain = git_commit_wrap()
+    prompt_chain = git_commit_wrap(m=m)
     if len(prompt_chain) > 0:
         resp = execute_prompt_chain(prompt_chain, gpt_ver=gpt_ver)
         gpt_output = parse_gpt_resp(resp)

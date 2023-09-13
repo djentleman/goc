@@ -4,12 +4,15 @@ from typing import List
 import click
 import openai
 
+from goc.config_reader import get_diff_config, get_commit_config
+
 
 def exec_bash_cmd(cmd):
     return os.popen(cmd).read()[:-1]
 
 
 def document_git_diff_wrap(args):
+    diff_config = get_diff_config()
     fmt_args = " ".join(args)
     cmd = f"git diff {fmt_args}"
     git_diff = exec_bash_cmd(cmd)
@@ -17,13 +20,15 @@ def document_git_diff_wrap(args):
         print('No Git Diff Found')
         return []
     prompt_chain = [
-        'I send you a git diff, and you write documentation of the commit in markdown',
+        'When I send you a git diff, write documentation of the diff in markdown for a pull request',
+        f'Please use this format for the git diff\n\n{diff_config}',
         git_diff
     ]
     return prompt_chain
 
 
 def git_commit_wrap(m: str = None):
+    commit_config = get_commit_config()
     cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     if len(git_diff) == 0:
@@ -31,7 +36,8 @@ def git_commit_wrap(m: str = None):
         return []
 
     prompt_chain = [
-        'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
+        'When I send you a git diff, write a commit message in 50 characters or less, do not include "git commit" or the character count',
+        f'Please use this format for the git diff\n\n{commit_config}',
     ]
     if m is not None:
         prompt_chain.append(

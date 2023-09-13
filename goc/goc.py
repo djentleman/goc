@@ -1,10 +1,13 @@
-import openai
 import os
-import json
-import argparse
+from typing import List
+
+import click
+import openai
+
 
 def exec_bash_cmd(cmd):
     return os.popen(cmd).read()[:-1]
+
 
 def document_git_diff_wrap(args):
     fmt_args = " ".join(args)
@@ -19,17 +22,19 @@ def document_git_diff_wrap(args):
     ]
     return prompt_chain
 
+
 def git_commit_wrap():
     cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     if len(git_diff) == 0:
-        print('No Git Diff Found')
+        print('No Staged Git Diff Found')
         return []
     prompt_chain = [
         'I send you a git diff, and you write a commit message in 50 characters or less, do not include "git commit"',
         git_diff
     ]
     return prompt_chain
+
 
 def execute_prompt_chain(prompt_chain, gpt_ver='3.5-turbo'):
     resp = openai.ChatCompletion.create(
@@ -41,9 +46,11 @@ def execute_prompt_chain(prompt_chain, gpt_ver='3.5-turbo'):
     )    
     return resp
 
+
 def parse_gpt_resp(resp):
     gpt_output = resp['choices'][-1]['message']['content']
     return gpt_output
+
 
 def do_git_commit(gpt_output):
     gpt_output = gpt_output.split('\n')[0]
@@ -52,49 +59,44 @@ def do_git_commit(gpt_output):
     cmd = f'git commit -m {gpt_output}'
     exec_bash_cmd(cmd)
 
-def print_help_text():
-    helptext = """
-Usage: goc <mode> <args>
 
-Modes:
-  diff <args>      Generate documentation for the git diff between commits or files.
-  commit           Generate a commit message for the current git diff.
+@click.group()
+def diff_cmd():
+    pass
 
-Options:
-  help             Show this help text.
 
-"""
-    print(helptext)
+@click.group()
+def commit_cmd():
+    pass
 
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['commit', 'diff', 'help'], default='help')
-    parser.add_argument('--gpt_ver', default='3.5-turbo')
 
-    args, gitargs = parser.parse_known_args()
-    return args, gitargs
+@diff_cmd.command(help="Generate documentation for the git diff between commits or files")
+@click.option("--gpt_ver", help="GPT model version to use", default="3.5-turbo")
+@click.argument('args', nargs=-1, type=click.UNPROCESSED)
+def diff(gpt_ver: str, args: List[str]):
+    prompt_chain = []
+    prompt_chain = document_git_diff_wrap(args)
+    if len(prompt_chain) > 0:
+        resp = execute_prompt_chain(prompt_chain, gpt_ver=gpt_ver)
+        gpt_output = parse_gpt_resp(resp)
+        print(gpt_output)
+
+
+@commit_cmd.command(help="Generate a commit message for the current git diff")
+@click.option("--gpt_ver", help="GPT model version to use", default="3.5-turbo")
+def commit(gpt_ver: str):
+    prompt_chain = []
+    prompt_chain = git_commit_wrap()
+    if len(prompt_chain) > 0:
+        resp = execute_prompt_chain(prompt_chain, gpt_ver=gpt_ver)
+        gpt_output = parse_gpt_resp(resp)
+        print('Committing with message: ' + gpt_output)
+        do_git_commit(gpt_output)
+
 
 def goc():
-    args, gitargs = get_args()
-    prompt_chain = []
-    if args.mode == 'help':
-        print_help_text()
-        return
-    if args.mode == 'diff':
-        # just pass the args directly into git diff
-        prompt_chain = document_git_diff_wrap(gitargs)
-    elif args.mode == 'commit':
-        # get description of the current diff
-        prompt_chain = git_commit_wrap()
-
-    if len(prompt_chain) > 0:
-        resp = execute_prompt_chain(prompt_chain, gpt_ver=args.gpt_ver)
-        gpt_output = parse_gpt_resp(resp)
-        if args.mode == 'diff':
-            print(gpt_output)
-        elif args.mode == 'commit':
-            print('Committing with message: ' + gpt_output)
-            do_git_commit(gpt_output)
+    cli = click.CommandCollection(sources=[diff_cmd, commit_cmd])
+    cli()
 
 
 if __name__ == '__main__':

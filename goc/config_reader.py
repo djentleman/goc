@@ -6,7 +6,7 @@ def parse_config():
     return config
 
 def get_default_commit_template():
-    return "<feat/fix/update>: <commit message>"
+    return "<feat|fix|update>: <commit message>"
 
 def get_default_diff_template():
     return """# Git Commit Diff

@@ -44,13 +44,13 @@ class DocumentGitDiffWrapTests(unittest.TestCase):
 ## Files Modified
 - List the files that were modified in this commit:
 
-  - `file1.ext`: Describe changes made in this file.
-  - `file2.ext`: Explain modifications in this file.
-  - ...
+    - `file1.ext`: Describe changes made in this file.
+    - `file2.ext`: Explain modifications in this file.
+    - ...
 
 ## Changes Made
 - Specify the changes made to each file, including additions, deletions, and modifications.
-    """,
+""",
             "git_diff_output"
         ]
 

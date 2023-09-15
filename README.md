@@ -1,6 +1,6 @@
-# GOC
+# GOC (Git Ops Chatbot)
 
-This script, `goc.py`, is a utility tool that leverages the OpenAI GPT-3.5 Turbo model to generate Markdown documentation for Git diffs and commits. It can be used to automatically generate a markdown document based on the output of git diff:
+This script `goc`, is a utility tool that leverages the OpenAI GPT-3.5 Turbo model to generate Markdown documentation for Git diffs and commits. It can be used to automatically generate a markdown document based on the output of git diff:
 
 
 ## Prerequisites
@@ -68,6 +68,11 @@ For the commit mode, no additional arguments are needed.
   goc commit
   ```
 
+- **Automatically generate commit message and commit, but give a hint**:
+  ```bash
+  goc commit -m 'typo in script.py'
+  ```
+
 ## Output
 
 The script generates Markdown documentation by utilizing the OpenAI GPT-3.5 Turbo model. The resulting documentation will be displayed in the console output.
@@ -99,6 +104,14 @@ Please review and merge these changes.
 $ goc commit
 Committing with message: "Update git diff handling, handle case when no diff is found"
 ```
+
+## Configuration
+You can configure goc using this file: `~/.config/goc/config.yaml`.
+
+Currently the configurable fields are:
+ - goc diff template
+ - goc commit template
+ - default GPT ver (can override using cmd line flag)
 
 ## Note
 

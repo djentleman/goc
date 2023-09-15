@@ -4,7 +4,7 @@ from typing import List
 import click
 import openai
 
-from goc.config import get_template, TemplateType
+from goc.config import get_template, TemplateType, get_gpt_ver
 
 
 def exec_bash_cmd(cmd):
@@ -47,7 +47,9 @@ def git_commit_wrap(m: str = None):
     return prompt_chain
 
 
-def execute_prompt_chain(prompt_chain, gpt_ver='3.5-turbo'):
+def execute_prompt_chain(prompt_chain, gpt_ver=None):
+    if gpt_ver is None:
+        gpt_ver = get_gpt_ver()
     resp = openai.ChatCompletion.create(
         model=f"gpt-{gpt_ver}",
         messages=[
@@ -82,7 +84,7 @@ def commit_cmd():
 
 
 @diff_cmd.command(help="Generate documentation for the git diff between commits or files")
-@click.option("--gpt_ver", help="GPT model version to use", default="3.5-turbo")
+@click.option("--gpt_ver", help="GPT model version to use", default=None)
 @click.argument('args', nargs=-1, type=click.UNPROCESSED)
 def diff(gpt_ver: str, args: List[str]):
     prompt_chain = []
@@ -94,7 +96,7 @@ def diff(gpt_ver: str, args: List[str]):
 
 
 @commit_cmd.command(help="Generate a commit message for the current git diff")
-@click.option("--gpt_ver", help="GPT model version to use", default="3.5-turbo")
+@click.option("--gpt_ver", help="GPT model version to use", default=None)
 @click.option("-m", help="Hint Message to send to chat GPT", default=None)
 def commit(gpt_ver: str, m: str):
     prompt_chain = []

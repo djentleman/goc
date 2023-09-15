@@ -66,7 +66,7 @@ def read_config() -> Dict[str,str]:
 
 
 def parse_config() -> Dict[str,str]:
-    default_config = get_default_template_dict
+    default_config = get_default_template_dict()
     if os.path.exists(CONFIG_PATH):
         config = read_config()
         # check if any fields are missing

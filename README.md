@@ -105,6 +105,14 @@ $ goc commit
 Committing with message: "Update git diff handling, handle case when no diff is found"
 ```
 
+## Configuration
+You can configure goc using this file: `~/.config/goc/config.yaml`.
+
+Currently the configurable fields are:
+ - goc diff template
+ - goc commit template
+ - default GPT ver (can override using cmd line flag)
+
 ## Note
 
 Make sure you have the necessary permissions and access to the Git repository you intend to analyze. Also, ensure that the repository is properly cloned on your local machine.

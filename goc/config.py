@@ -21,7 +21,7 @@ class MultilineLiteralDumper(yaml.Dumper):
 
 
 CONFIG_PATH = os.path.expanduser("~/.config/goc/config.yaml")
-
+DEFAULT_GPT_VER = "3.5-turbo"
 DEFAULT_DIFF_TEMPLATE = """# Git Commit Diff
 
 ## Description
@@ -40,16 +40,23 @@ DEFAULT_DIFF_TEMPLATE = """# Git Commit Diff
 
 DEFAULT_COMMIT_TEMPLATE = "<Fix|Add|Update|Refactor|Docs>: <commit message>"
 
+def get_default_template_dict():
+    return  {
+        "diff_template": DEFAULT_DIFF_TEMPLATE,
+        "commit_template": DEFAULT_COMMIT_TEMPLATE,
+        "gpt_ver": DEFAULT_GPT_VER
+    }
+
+def write_config(config_dict):
+    with open(CONFIG_PATH, "w") as file:
+        yaml.dump(config_dict, file, Dumper=MultilineLiteralDumper, default_flow_style=False)
+    print("goc generated a config file with default diff and commit templates under ~/.config/goc")
+
 
 def generate_default_template() -> None:
     os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, "w") as file:
-        default_template_dict = {
-            "diff_template": DEFAULT_DIFF_TEMPLATE,
-            "commit_template": DEFAULT_COMMIT_TEMPLATE
-        }
-        yaml.dump(default_template_dict, file, Dumper=MultilineLiteralDumper, default_flow_style=False)
-    print("goc generated a config file with default diff and commit templates under ~/.config/goc")
+    default_template_dict = get_default_template_dict()
+    write_config(default_template_dict)
 
 
 def read_config() -> Dict[str,str]:
@@ -59,8 +66,14 @@ def read_config() -> Dict[str,str]:
 
 
 def parse_config() -> Dict[str,str]:
+    default_config = get_default_template_dict
     if os.path.exists(CONFIG_PATH):
         config = read_config()
+        # check if any fields are missing
+        if config.keys() != default_config.keys():
+            upd_config = default_config | config
+            write_config(upd_config)
+            config = upd_config
     else:
         try:
             generate_default_template()
@@ -75,3 +88,7 @@ def parse_config() -> Dict[str,str]:
 def get_template(template_type: TemplateType) -> str:
     config = parse_config()
     return config[template_type.value]
+
+def get_gpt_ver():
+    config = parse_config()
+    return config['gpt_ver']

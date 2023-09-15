@@ -4,7 +4,7 @@ from typing import List
 import click
 import openai
 
-from goc.config_reader import get_diff_config, get_commit_config
+from goc.config import get_template, TemplateType
 
 
 def exec_bash_cmd(cmd):
@@ -12,7 +12,7 @@ def exec_bash_cmd(cmd):
 
 
 def document_git_diff_wrap(args):
-    diff_config = get_diff_config()
+    diff_config = get_template(TemplateType.Diff)
     fmt_args = " ".join(args)
     cmd = f"git diff {fmt_args}"
     git_diff = exec_bash_cmd(cmd)
@@ -28,7 +28,7 @@ def document_git_diff_wrap(args):
 
 
 def git_commit_wrap(m: str = None):
-    commit_config = get_commit_config()
+    commit_config = get_template(TemplateType.Commit)
     cmd = f"git diff --staged"
     git_diff = exec_bash_cmd(cmd)
     if len(git_diff) == 0:

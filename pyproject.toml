@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "goc"
-version = "0.6.0"
+version = "0.6.1"
 description = ""
 authors = ["Todd Perry <toddperry171@gmail.com>", "Masa Fukui <masahiro.m.fukui@gmail.com"]
 readme = "README.md"
@@ -14,6 +14,7 @@ packages = [
 python = "^3.8"
 openai = "^0.27.8"
 click = "^8.1.7"
+pyyaml = "^6.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -71,7 +71,7 @@ def parse_config() -> Dict[str,str]:
         config = read_config()
         # check if any fields are missing
         if config.keys() != default_config.keys():
-            upd_config = default_config | config
+            upd_config = {**default_config, **config}
             write_config(upd_config)
             config = upd_config
     else:
